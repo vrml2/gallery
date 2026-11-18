@@ -2,8 +2,7 @@
 <head>
 <meta http-equiv="content-type" content="text/html" charset="UTF-8">
     <title>3D Model Viewer/Recorder</title>
-	<link rel="stylesheet" type="text/css" href="https://create3000.github.io/code/x_ite/4.7.15/dist/x_ite.css"/>
-	<script type="text/javascript" src="https://create3000.github.io/code/x_ite/4.7.15/dist/x_ite.min.js"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/x_ite@15.1.10/dist/x_ite.min.js"></script>
 	<script type="text/javascript">
 		// pull a parameter off url
 		function GetURLParameter(paramName){
@@ -18,7 +17,7 @@
 		
 		// insert a new X3DCanvas Element, inside the provided element, set its source from the page urls 'paramName' parameter and return the base of the url. 
 		function insertX3DCanvasChild(elem,paramName){
-			var n = document.createElement("X3DCanvas")
+			var n = document.createElement("x3d-canvas")
 			var a = document.createAttribute("src")
 			a.value =GetURLParameter(paramName);
 			n.setAttributeNode(a);  
@@ -36,6 +35,7 @@
     <script type="text/javascript">
 		function record(ms){
 			var mr=new MediaRecorder(ms)
+//			var mr=new MediaRecorder(ms,{mimeType:"video/mp4"})
 			mr.onwarning = function(e){
 				console.log(e)
 			}
@@ -64,7 +64,7 @@
 	</script>
 
     <style>
-    X3DCanvas {
+    x3d-canvas {
       width: 100%;
       height: 100%;
     }
@@ -88,39 +88,52 @@
 		cursor: pointer;
 		user-select: none;
 	}
+	.outlinedText {
+		text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;		
+	}	
+
+	.hoverRevealNext:not(:hover)+input {
+		position:relative;
+		z-index:2;
+	}
+
+	.hoverRevealNext:hover+input{
+		display:inline;
+		border:grey;
+	}	
 	
 	.labelledBlinkingToggler {
 		display:none;
 	}
 
-	.labelledBlinkingToggler:checked+span:first-child{
-		animation: blinker .5s infinite;
+	.labelledBlinkingToggler:checked+span{
+		animation: blinker 1s infinite;
 	}
 
-	.outlinedText {
-		text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;		
-	}	
-	
 	@keyframes blinker {
-		50% {
+		30% {
 		    opacity: 0;
+		}
+		40% {
+		    opacity: 1;
 		}
 	}
     </style>
 </head>
 <body onload="this.document.body.firstElementChild.firstElementChild.onload();">
-<label class="widget" title="Model Reference">
+<label class="widget outlinedText" title="Model Reference">
 <input class="labelledBlinkingToggler" type="checkbox" 
 onload="this.nextElementSibling.nextElementSibling.textContent=insertX3DCanvasChild(this.parentElement.nextElementSibling,'model')"
 oninput="if (this.checked){
-this[record]=record(this.parentElement.nextElementSibling.firstElementChild.children[0].children[1].children[0].captureStream(25));
+this[record]=record(this.parentElement.nextElementSibling.firstElementChild.captureStream(12.5));
 this[record].start();
 }else{
 this[record].stop();
 };">
 </input>
-<span title="Recording Status" style="color:red;font-size:larger;">●</span>
-<span class="outlinedText">No Model Set</span>
+<span title="Recording Status" class="hoverRevealNext" style="color:red;">⏺</span>
+<!--<input type="range" style="display:block;" onchange="this.title=this.value+'fps'" id="fps" min="5" max="100" step="5" value="30">-->
+<span>No Model</span>
 </label>
 <span></span>
 <!--<input type="checkbox" oninput="alert(this.firstElementChild);if (this.checked){this.firstElementChild.textContent='🔇︎'}else{this.firstElementChild.textContent='🔊︎'}">-->
@@ -128,3 +141,4 @@ this[record].stop();
 <!--</input>-->
 </body>
 </html>
+
